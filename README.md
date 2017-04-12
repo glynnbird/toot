@@ -31,6 +31,10 @@ After the inital setup, sending a toot is a breeze:
 
     > toot "I'm sending a Toot from the command-line!"
 
+You can also pipe data from other processes into *toot*:
+
+    > cat longfile.txt | grep 'message' | toot
+    
 ## Why would I want this?
 
 Perhaps you want to set up a Mastodon account for servers you are looking after. They can then be easily configured
