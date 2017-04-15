@@ -29,7 +29,7 @@
   "homepage": "https://github.com/glynnbird/toot#readme",
   "dependencies": {
     "colors": "^1.1.2",
-    "mastodon-api": "^1.1.1",
+    "mastodon-api": "^1.2.0",
     "prompt": "^1.0.0"
   }
 }
