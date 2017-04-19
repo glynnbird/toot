@@ -125,13 +125,13 @@ const interactive = function(configFilename) {
 }
 
 // send a status update
-const toot = function(config, message) {
+const toot = function(config, message, visibility) {
   const c = {
     access_token: config.accessToken,
     api_url: config.baseURL + '/api/v1/'
   };
   const M = new Mastodon(c);
-  return M.post('statuses', { status: message});
+  return M.post('statuses', { status: message, visibility: visibility });
 };
 
 module.exports = {

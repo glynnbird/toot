@@ -11,6 +11,7 @@ var args = require('commander');
 args
   .version(pkg.version)
   .option('-c, --config [path]', 'Path to config file. Defaults to ~/.mastodon.json')
+  .option('--visibility [direct|private|unlisted|public]. Defaults to "public"')
   .parse(process.argv);
 
 // if we have no config
@@ -46,7 +47,7 @@ if (!config) {
 
     // when it ends
     process.stdin.on('end', function() {
-      app.toot(config, toot).then(function() {
+      app.toot(config, toot, args.visibility).then(function() {
         process.exit(0);
       });
     });
@@ -54,7 +55,7 @@ if (!config) {
   } else  if (args.args && args.args[0]) {
 
     // send the toot from the command-line argument
-    app.toot(config, args.args[0]).then(function() {
+    app.toot(config, args.args[0], args.visibility).then(function() {
       process.exit(0);
     });
   }
