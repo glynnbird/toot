@@ -1,29 +1,33 @@
 #!/usr/bin/env node
 
-var app = require('../');
-var config = app.config();
-var pkg = require('../package.json');
-var title = pkg.name + ' - ' + pkg.description;
+const app = require('../');
+const os = require('os');
+const path = require('path');
+const pkg = require('../package.json');
+const title = pkg.name + ' - ' + pkg.description;
 
-// help and usage message
-var usage = function() {
-  console.log(title);
-  console.log('Usage: toot "message"');
-  console.log('   or: echo "message" | toot');
-  process.exit();
-};
+// command-line args
+var args = require('commander');
+args
+  .version(pkg.version)
+  .option('-c, --config [path]', 'Path to config file. Defaults to ~/.mastodon.json')
+  .parse(process.argv);
 
-// version message
-var version = function() {
-  console.log(pkg.version);
-  process.exit();
-};
+// if we have no config
+var configPath = args.config || path.join(os.homedir(),'.mastodon.json');
+var config = app.config(configPath);
+
+// if the config is missing
+if (configPath && !config) {
+  console.error('Missing config file');
+  process.exit(1);
+}
 
 // if we have no config
 if (!config) {
 
   // go into setup mode
-  app.interactive();
+  app.interactive(configPath);
 
 } else {
 
@@ -47,15 +51,10 @@ if (!config) {
       });
     });
 
-  } else  if (process.argv.length < 3) {
-    usage();
-  } else  if (process.argv[2] === '--help') {
-    usage()
-  } else if (process.argv[2] === '--version') {
-    version();
-  } else {
+  } else  if (args.args && args.args[0]) {
+
     // send the toot from the command-line argument
-    app.toot(config, process.argv[2]).then(function() {
+    app.toot(config, args.args[0]).then(function() {
       process.exit(0);
     });
   }

@@ -1,14 +1,12 @@
 "use strict"
 
-const os = require('os');
-const path = require('path');
 const fs = require('fs');
-const configFilename = path.join(os.homedir(),'.mastodon.json');
 const Mastodon = require('mastodon-api');
 const colors = require('colors');
 
 // load config file
-const config = function() {
+const config = function(configFilename) {
+
   try {
     var data = fs.readFileSync(configFilename);
   } catch(e) {
@@ -21,7 +19,7 @@ const config = function() {
 };
 
 // save config to file
-const saveConfig = function(config) {
+const saveConfig = function(config, configFilename) {
   return new Promise(function(resolve, reject) {
     fs.writeFile(configFilename, JSON.stringify(config), { mode: '0600' }, function(err, data) {
       if (err) {
@@ -87,7 +85,7 @@ const getPassCode = function() {
 }
 
 // generate config file interactively
-const interactive = function() {
+const interactive = function(configFilename) {
 
   var config = {};
   var baseURL = null;
@@ -115,7 +113,7 @@ const interactive = function() {
     return Mastodon.getAccessToken(config.client_id, config.client_secret, code, config.baseURL)
   }).then(function(accessToken) {
     config.accessToken = accessToken;
-    return saveConfig(config);
+    return saveConfig(config, configFilename);
   }).then(function(data) {
     console.log('Autentication complete!'.bold.red);
     console.log('You can now do:');
