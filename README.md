@@ -35,6 +35,18 @@ You can also pipe data from other processes into *toot*:
 
     > cat longfile.txt | grep 'message' | toot
     
+## Options
+
+* --visibility [direct|private|unlisted|public] - the visibility of the toot
+* --config [path] - location of the config file
+* --help - view help text
+* --version - show version number
+
+e.g.
+
+    > toot --visibility private "secret"
+    > toot --config ~/myconfig.json --visibility unlisted "hello there"
+
 ## Why would I want this?
 
 Perhaps you want to set up a Mastodon account for servers you are looking after. They can then be easily configured
