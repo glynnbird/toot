@@ -14,6 +14,11 @@ args
   .option('--visibility [direct|private|unlisted|public]. Defaults to "public"')
   .parse(process.argv);
 
+// public by default
+if (!args.visibility) {
+  args.visibility = 'public';
+}
+
 // if we have no config
 var configPath = args.config || path.join(os.homedir(),'.mastodon.json');
 var config = app.config(configPath);
