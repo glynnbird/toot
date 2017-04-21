@@ -24,7 +24,7 @@ var configPath = args.config || path.join(os.homedir(),'.mastodon.json');
 var config = app.config(configPath);
 
 // if the config is missing
-if (configPath && !config) {
+if (args.config && !config) {
   console.error('Missing config file');
   process.exit(1);
 }
