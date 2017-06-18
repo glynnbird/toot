@@ -56,3 +56,6 @@ to send status updates:
     > toot "$HOSTNAME is going down for maintenance. Farewell dear friends"
     > toot "$HOSTNAME is up. I'm back!"
  
+ ## Reconfiguring
+ 
+If you want to reconfigure Toot from the beginning, simply delete the `~/.mastodon.json` file and run `toot` again to reauthorise.
