@@ -44,7 +44,7 @@ const getAppDetails = function() {
       domain: {
         description: 'Enter the domain name of your Mastodon instance e.g. mastodon.social',
         type: 'string',
-        pattern: '^[a-z0-9_\.\-]+$',
+        pattern: '^[a-z0-9_\.\-:]+$',
         default: 'mastodon.social',
         required: true
       }
@@ -94,7 +94,7 @@ const interactive = function(configFilename) {
   return getAppDetails().then(function(d) {
     config.domain = d.domain;
     config.name = d.name;
-    config.baseURL = 'https://' + config.domain;
+    config.baseURL = (/^(localhost|127\.0\.0\.1)/.test(config.domain) ? 'http' : 'https') + '://' + config.domain;
     return Mastodon.createOAuthApp(config.baseURL + '/api/v1/apps', config.name);
   }).then(function(data) {
     for (var i in data) {
