@@ -8,7 +8,7 @@ A simple command-line utility that allows you to post a "toot" (equivalent of a 
 
 ## Running first time
 
-When you first run `toot` you will be asked some questions in order for *toot* to authenticate with your Mastondon service
+When you first run `toot` you will be asked some questions in order for *toot* to authenticate with your Mastodon service
 
     > toot
     Before you start using toot, you need to authenticate with your Mastodon server.
