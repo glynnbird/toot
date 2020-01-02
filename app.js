@@ -44,7 +44,7 @@ const getAppDetails = function() {
       domain: {
         description: 'Enter the domain name of your Mastodon instance e.g. mastodon.social',
         type: 'string',
-        pattern: '^[a-z0-9_\.\-:]+$',
+        pattern: '^[a-z0-9_\.:-]+$',
         default: 'mastodon.social',
         required: true
       }
