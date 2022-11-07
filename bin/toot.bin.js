@@ -20,7 +20,7 @@ if (!args.visibility) {
 }
 
 // if we have no config
-var configPath = args.config || path.join(os.homedir(),'.mastodon.json');
+var configPath = args.config || path.join(os.homedir(), '.mastodon.json');
 var config = app.config(configPath);
 
 // if the config is missing
@@ -29,40 +29,42 @@ if (args.config && !config) {
   process.exit(1);
 }
 
-// if we have no config
-if (!config) {
+const main = async () => {
+  // if we have no config
+  if (!config) {
 
-  // go into setup mode
-  app.interactive(configPath);
+    // go into setup mode
+    await app.interactive(configPath);
 
-} else {
+  } else {
 
-  // if we have something piped to stdin
-  if (!process.stdin.isTTY) {
-    var toot = '';
-    process.stdin.setEncoding('utf8');
+    // if we have something piped to stdin
+    if (!process.stdin.isTTY) {
+      var toot = '';
+      process.stdin.setEncoding('utf8');
 
-    // read each chunk from stdin
-    process.stdin.on('readable', function() {
-      var chunk = process.stdin.read();
-      if (chunk !== null) {
-        toot += chunk;
-      }
-    });
+      // read each chunk from stdin
+      process.stdin.on('readable', function () {
+        var chunk = process.stdin.read();
+        if (chunk !== null) {
+          toot += chunk;
+        }
+      });
 
-    // when it ends
-    process.stdin.on('end', function() {
-      app.toot(config, toot, args.visibility).then(function() {
+      // when it ends
+      process.stdin.on('end', async function () {
+        await app.toot(config, toot, args.visibility)
         process.exit(0);
       });
-    });
 
-  } else  if (args.args && args.args[0]) {
+    } else if (args.args && args.args[0]) {
 
-    // send the toot from the command-line argument
-    app.toot(config, args.args[0], args.visibility).then(function() {
+      // send the toot from the command-line argument
+      await app.toot(config, args.args[0], args.visibility)
       process.exit(0);
-    });
+    }
+
   }
- 
 }
+
+main()

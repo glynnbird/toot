@@ -19,7 +19,7 @@ const config = function(configFilename) {
 };
 
 // save config to file
-const saveConfig = function(config, configFilename) {
+const saveConfig = async function(config, configFilename) {
   return new Promise(function(resolve, reject) {
     fs.writeFile(configFilename, JSON.stringify(config), { mode: '0600' }, function(err, data) {
       if (err) {
@@ -31,7 +31,7 @@ const saveConfig = function(config, configFilename) {
 };
 
 // prompt for namd & domain
-const getAppDetails = function() {
+const getAppDetails = async function() {
   var prompt = require('prompt');
   var schema = {
     properties: {
@@ -62,7 +62,7 @@ const getAppDetails = function() {
 };
 
 // prompt for pass code
-const getPassCode = function() {
+const getPassCode = async function() {
   var prompt = require('prompt');
   var schema = {
     properties: {
@@ -85,47 +85,42 @@ const getPassCode = function() {
 }
 
 // generate config file interactively
-const interactive = function(configFilename) {
+const interactive = async function(configFilename) {
 
   var config = {};
   var baseURL = null;
   console.log('Before you start using toot, you need to authenticate with your Mastodon server.'.bold.red);
 
-  return getAppDetails().then(function(d) {
-    config.domain = d.domain;
-    config.name = d.name;
-    config.baseURL = (/^(localhost|127\.0\.0\.1)/.test(config.domain) ? 'http' : 'https') + '://' + config.domain;
-    return Mastodon.createOAuthApp(config.baseURL + '/api/v1/apps', config.name);
-  }).then(function(data) {
-    for (var i in data) {
-      config[i] = data[i];
-    }
-    return Mastodon.getAuthorizationUrl(config.client_id, config.client_secret, config.baseURL)
-  }).then(function(url) {
-    console.log('\nPlease visit: '.blue);
-    console.log('');
-    console.log(url.bold.green);
-    console.log('')
-    console.log('in your browser and enter the code you were given back'.blue);
-    console.log('');
-    return getPassCode();
-  }).then(function(code) {
-    return Mastodon.getAccessToken(config.client_id, config.client_secret, code, config.baseURL)
-  }).then(function(accessToken) {
-    config.accessToken = accessToken;
-    return saveConfig(config, configFilename);
-  }).then(function(data) {
-    console.log('Autentication complete!'.bold.red);
-    console.log('You can now do:');
-    console.log('   toot <message>'.red);
-    console.log('to post to Mastodon.');
-    console.log('');
-    return config;
-  }).catch(console.error);
+  const d = await getAppDetails()
+  config.domain = d.domain;
+  config.name = d.name;
+  config.baseURL = (/^(localhost|127\.0\.0\.1)/.test(config.domain) ? 'http' : 'https') + '://' + config.domain;
+  
+  const data = await Mastodon.createOAuthApp(config.baseURL + '/api/v1/apps', config.name)
+  for (var i in data) {
+    config[i] = data[i];
+  }
+  const url = await Mastodon.getAuthorizationUrl(config.client_id, config.client_secret, config.baseURL)
+  console.log('\nPlease visit: '.blue);
+  console.log('');
+  console.log(url.bold.green);
+  console.log('')
+  console.log('in your browser and enter the code you were given back'.blue);
+  console.log('');
+  const code = await getPassCode();
+  const accessToken = await  Mastodon.getAccessToken(config.client_id, config.client_secret, code, config.baseURL)
+  config.accessToken = accessToken;
+  await saveConfig(config, configFilename);
+  console.log('Autentication complete!'.bold.red);
+  console.log('You can now do:');
+  console.log('   toot <message>'.red);
+  console.log('to post to Mastodon.');
+  console.log('');
+  return config;
 }
 
 // send a status update
-const toot = function(config, message, visibility) {
+const toot = async function(config, message, visibility) {
   const c = {
     access_token: config.accessToken,
     api_url: config.baseURL + '/api/v1/'
