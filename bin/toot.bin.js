@@ -63,7 +63,7 @@ const main = async () => {
       })
     } else if (args && body) {
       // send the toot from the command-line argument
-      const r = await app.toot(config, body, args.visibility, args.cw)
+      await app.toot(config, body, args.visibility, args.cw)
       process.exit(0)
     }
   }
