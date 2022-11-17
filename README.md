@@ -37,15 +37,16 @@ You can also pipe data from other processes into *toot*:
     
 ## Options
 
-* --visibility [direct|private|unlisted|public] - the visibility of the toot
-* --config [path] - location of the config file
-* --help - view help text
-* --version - show version number
+* `--visibility`/`-v` [direct|private|unlisted|public] - the visibility of the toot
+* `--cw`/`-c` - content warning text
+* `--config` [path] - location of the config file
+* `--help` - view help text
+* `--version` - show version number
 
 e.g.
 
     > toot --visibility private "secret"
-    > toot --config ~/myconfig.json --visibility unlisted "hello there"
+    > toot -v unlisted -c "Knock Knock" "Who's there?"
 
 ## Why would I want this?
 

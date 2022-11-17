@@ -1,69 +1,71 @@
 #!/usr/bin/env node
 
-const app = require('../');
-const os = require('os');
-const path = require('path');
-const pkg = require('../package.json');
-const title = pkg.name + ' - ' + pkg.description;
+const app = require('../')
+const os = require('os')
+const path = require('path')
 
-// command-line args
-var args = require('commander');
-args
-  .version(pkg.version)
-  .option('-c, --config [path]', 'Path to config file. Defaults to ~/.mastodon.json')
-  .option('--visibility [direct|private|unlisted|public]. Defaults to "public"')
-  .parse(process.argv);
+const args = require('yargs')
+  .option('config', {
+    describe: 'Path to config file',
+    default: path.join(os.homedir(), '.mastodon.json')
+  })
+  .option('visibility', {
+    alias: ['v'],
+    choices: ['direct', 'private', 'unlisted', 'public'],
+    describe: 'Visibility of toot',
+    default: 'public'
+  })
+  .option('cw', {
+    alias: ['c'],
+    type: 'string',
+    describe: 'Content warning to appear before "Read More" reveal',
+    default: undefined
+  })
+  .demandCommand(!process.stdin.isTTY ? 0 : 1)
+  .help('help')
+  .epilogue('Usage: toot <options> "toot text"')
+  .argv
 
-// public by default
-if (!args.visibility) {
-  args.visibility = 'public';
-}
+const body = args._[0]
 
 // if we have no config
-var configPath = args.config || path.join(os.homedir(), '.mastodon.json');
-var config = app.config(configPath);
+const config = app.config(args.config)
 
 // if the config is missing
 if (args.config && !config) {
-  console.error('Missing config file');
-  process.exit(1);
+  console.error('Missing config file')
+  process.exit(1)
 }
 
 const main = async () => {
   // if we have no config
   if (!config) {
-
     // go into setup mode
-    await app.interactive(configPath);
-
+    await app.interactive(args.config)
   } else {
-
     // if we have something piped to stdin
     if (!process.stdin.isTTY) {
-      var toot = '';
-      process.stdin.setEncoding('utf8');
+      let toot = ''
+      process.stdin.setEncoding('utf8')
 
       // read each chunk from stdin
       process.stdin.on('readable', function () {
-        var chunk = process.stdin.read();
+        const chunk = process.stdin.read()
         if (chunk !== null) {
-          toot += chunk;
+          toot += chunk
         }
-      });
+      })
 
       // when it ends
       process.stdin.on('end', async function () {
         await app.toot(config, toot, args.visibility)
-        process.exit(0);
-      });
-
-    } else if (args.args && args.args[0]) {
-
+        process.exit(0)
+      })
+    } else if (args && body) {
       // send the toot from the command-line argument
-      await app.toot(config, args.args[0], args.visibility)
-      process.exit(0);
+      const r = await app.toot(config, body, args.visibility, args.cw)
+      process.exit(0)
     }
-
   }
 }
 
