@@ -21,7 +21,6 @@ const args = require('yargs')
     describe: 'Content warning to appear before "Read More" reveal',
     default: undefined
   })
-  .demandCommand(!process.stdin.isTTY ? 0 : 1)
   .help('help')
   .epilogue('Usage: toot <options> "toot text"')
   .argv
@@ -31,16 +30,11 @@ const body = args._[0]
 // if we have no config
 const config = app.config(args.config)
 
-// if the config is missing
-if (args.config && !config) {
-  console.error('Missing config file')
-  process.exit(1)
-}
-
 const main = async () => {
   // if we have no config
   if (!config) {
     // go into setup mode
+    console.log('No Mastodon config found. Going into setup mode.')
     await app.interactive(args.config)
   } else {
     // if we have something piped to stdin
@@ -65,6 +59,10 @@ const main = async () => {
       // send the toot from the command-line argument
       await app.toot(config, body, args.visibility, args.cw)
       process.exit(0)
+    } else {
+      console.error('No message supplied - nothing to do')
+      console.error('Usage: toot <message>')
+      process.exit(1)
     }
   }
 }
