@@ -3,39 +3,56 @@
 const app = require('../')
 const os = require('os')
 const path = require('path')
-
-const args = require('yargs')
-  .option('config', {
-    describe: 'Path to config file',
-    default: path.join(os.homedir(), '.mastodon.json')
-  })
-  .option('visibility', {
-    alias: ['v'],
-    choices: ['direct', 'private', 'unlisted', 'public'],
-    describe: 'Visibility of toot',
-    default: 'public'
-  })
-  .option('cw', {
-    alias: ['c'],
+const defaultConfigPath = path.join(os.homedir(), '.mastodon.json')
+const syntax = 
+`Syntax:
+--config                            Path to config file  
+--visibility/-v                     Visibility of toot direct/private/unlisted/public (default: public)
+--cw/-c                             Content warning message (default: false)
+`
+const { parseArgs } = require('node:util')
+const argv = process.argv.slice(2)
+const options = {
+  config: {
     type: 'string',
-    describe: 'Content warning to appear before "Read More" reveal',
-    default: undefined
-  })
-  .help('help')
-  .epilogue('Usage: toot <options> "toot text"')
-  .argv
+    default: defaultConfigPath
+  },
+  visibility: {
+    type: 'string',
+    short: 'v',
+    default: 'default'
+  },
+  cw: {
+    type: 'string'
+  },
+  help: {
+    type: 'boolean',
+    short: 'h',
+    default: false
+  }
+}
 
-const body = args._[0]
+// parse command-line options
+const { values, positionals } = parseArgs({ argv, options, allowPositionals: true })
 
-// if we have no config
-const config = app.config(args.config)
+// help mode
+if (values.help) {
+  console.log(syntax)
+  process.exit(0)
+}
+
+// extract message
+const body = positionals[0]
+
+// load config
+const config = app.config(values.config)
 
 const main = async () => {
   // if we have no config
   if (!config) {
     // go into setup mode
     console.log('No Mastodon config found. Going into setup mode.')
-    await app.interactive(args.config)
+    await app.interactive(values.config)
   } else {
     // if we have something piped to stdin
     if (!process.stdin.isTTY) {
@@ -52,12 +69,12 @@ const main = async () => {
 
       // when it ends
       process.stdin.on('end', async function () {
-        await app.toot(config, toot, args.visibility)
+        await app.toot(config, toot, values.visibility)
         process.exit(0)
       })
-    } else if (args && body) {
+    } else if (values && body) {
       // send the toot from the command-line argument
-      await app.toot(config, body, args.visibility, args.cw)
+      await app.toot(config, body, values.visibility, values.cw)
       process.exit(0)
     } else {
       console.error('No message supplied - nothing to do')
