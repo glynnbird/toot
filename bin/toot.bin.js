@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-const app = require('../')
-const os = require('os')
-const path = require('path')
+import os from 'node:os'
+import path from 'node:path'
+import { parseArgs } from 'node:util'
+import * as app from '../app.js'
+
 const defaultConfigPath = path.join(os.homedir(), '.mastodon.json')
 const syntax = 
 `Syntax:
@@ -10,7 +12,7 @@ const syntax =
 --visibility/-v                     Visibility of toot direct/private/unlisted/public (default: public)
 --cw/-c                             Content warning message (default: false)
 `
-const { parseArgs } = require('node:util')
+
 const argv = process.argv.slice(2)
 const options = {
   config: {
@@ -20,7 +22,7 @@ const options = {
   visibility: {
     type: 'string',
     short: 'v',
-    default: 'default'
+    default: 'public'
   },
   cw: {
     type: 'string'

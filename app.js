@@ -1,8 +1,8 @@
-const fs = require('fs')
-const m = require('mastodonclient')
+import fs from 'node:fs'
+import * as m from 'mastodonclient'
 
 // load config file
-const config = function (configFilename) {
+export function config(configFilename) {
   let data
   try {
     data = fs.readFileSync(configFilename)
@@ -28,7 +28,7 @@ const saveConfig = async function (config, configFilename) {
 }
 
 // generate config file interactively
-const interactive = async function (configFilename) {
+export async function interactive(configFilename) {
   const config = await m.auth()
   await saveConfig(config, configFilename)
   console.log('Autentication complete!')
@@ -40,13 +40,8 @@ const interactive = async function (configFilename) {
 }
 
 // send a status update
-const toot = async function (config, message, visibility, cw) {
+export async function toot(config, message, visibility, cw) {
   const mc = new m.MastodonClient(config)
   return await mc.post(message, visibility, cw)
 }
 
-module.exports = {
-  interactive,
-  toot,
-  config
-}
