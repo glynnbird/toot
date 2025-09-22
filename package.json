@@ -1,6 +1,6 @@
 {
   "name": "toot",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "A command-line Mastodon API utility - toot from the command-line!",
   "main": "app.js",
@@ -29,6 +29,6 @@
   },
   "homepage": "https://github.com/glynnbird/toot#readme",
   "dependencies": {
-    "mastodonclient": "2.0.0"
+    "mastodonclient": "2.0.1"
   }
 }
